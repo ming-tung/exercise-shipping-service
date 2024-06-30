@@ -1,0 +1,75 @@
+version: "3.7"
+
+services:
+
+  shipping-service:
+    container_name: shipping-service
+    build: .
+    image: shipping-service
+    volumes:
+      - .:/src
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: dev.env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  database:
+    container_name: shipping-service-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: admin
+    expose:
+      - "5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  celery:
+    container_name: shipping-service-celery
+    image: shipping-service
+    command: ./shipping_service/scripts/celery_beat_worker.sh
+    depends_on:
+      redis:
+        condition: service_healthy
+      shipping-service:
+        condition: service_healthy
+    env_file: dev.env
+    links:
+      - redis
+      - database
+
+  redis:
+    container_name: shipping-service-redis
+    image: redis:6.2-alpine
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning
+    expose:
+      - "6379"
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - redis_cache:/data
+
+
+volumes:
+  postgres_data:
+  redis_cache:
