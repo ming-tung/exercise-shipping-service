@@ -1,7 +1,6 @@
 # Coding exercise
 ![CI](https://github.com/ming-tung/exercise-shipping-service/actions/workflows/ci.yaml/badge.svg?branch=main)
-[![codecov](https://codecov.io/gh/ming-tung/exercise-shipping-service/branch/main/graph/badge.svg?token=8NE9REDOEU)](https://codecov.io/gh/ming-tung/exercise-shipping-service)
-(codecov is not available at the moment since it is a private repo) 
+[![codecov](https://codecov.io/gh/ming-tung/exercise-shipping-service/graph/badge.svg?token=EMYPLW172T)](https://codecov.io/gh/ming-tung/exercise-shipping-service)
 
 Shipping service - A dockerized API service powered by Django and Django Rest Framework
 
